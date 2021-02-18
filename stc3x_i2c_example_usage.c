@@ -1,9 +1,4 @@
 /*
- * I2C-Generator: 0.2.0
- * Yaml Version: 0.1.1
- * Template Version: 0.6.0
- */
-/*
  * Copyright (c) 2021, Sensirion AG
  * All rights reserved.
  *
@@ -39,67 +34,73 @@
 #include "sensirion_common.h"
 #include "sensirion_i2c_hal.h"
 #include "stc3x_i2c.h"
+#include <inttypes.h>
 
 /**
  * TO USE CONSOLE OUTPUT (PRINTF) IF NOT PRESENT ON YOUR PLATFORM
  */
 //#define printf(...)
-// TODO: DRIVER_GENERATOR Add missing commands and make prints more pretty
 
 int main(void) {
     int16_t error = 0;
 
     sensirion_i2c_hal_init();
 
+    error = stc3x_prepare_product_identifier();
+    if (error) {
+        printf("Error executing stc3x_prepare_product_identifier(): %i\n",
+               error);
+    }
+
     uint32_t product_number;
-    uint8_t serial_number[8];
-    uint8_t serial_number_size = 8;
-
-    error = stc3x_read_product_identifier(&product_number, serial_number,
-                                          serial_number_size);
-
+    uint8_t serial[8];
+    error = stc3x_read_product_identifier(&product_number, serial, 8);
     if (error) {
         printf("Error executing stc3x_read_product_identifier(): %i\n", error);
     } else {
-        printf("Product_number: %u\n", product_number);
-        printf("Serial_number: ");
-        for (size_t i = 0; i < serial_number_size; i++) {
-            printf("%u, ", serial_number[i]);
-        }
-        printf("\n");
+        // uint64_t serial_number =
+        //    (uint64_t)serial[0] << 56 | (uint64_t)serial[1] << 48 |
+        //    (uint64_t)serial[2] << 40 | (uint64_t)serial[3] << 32 |
+        //    (uint64_t)serial[4] << 24 | (uint64_t)serial[5] << 16 |
+        //    (uint64_t)serial[6] << 8 | (uint64_t)serial[7];
+        printf("Product Number: 0x%08x\n", product_number);
+        // printf("Serial Number: %" PRIu64 "\n", serial_number);
     }
 
     uint16_t self_test_output;
-
     error = stc3x_self_test(&self_test_output);
-
     if (error) {
         printf("Error executing stc3x_self_test(): %i\n", error);
     } else {
-        printf("Self_test_output: %u\n", self_test_output);
+        printf("Self Test: 0x%04x (OK = 0x0000)\n", self_test_output);
     }
 
-    // Start Measurement
+    error = stc3x_set_binary_gas(0x0001);
+    if (error) {
+        printf("Error executing stc3x_set_binary_gas(): %i\n", error);
+    } else {
+        printf("Set binary gas to 0x0001\n");
+    }
+
+    uint16_t gas_ticks;
+    uint16_t temperature_ticks;
+
+    float gas;
+    float temperature;
 
     for (;;) {
         // Read Measurement
-        // TODO: DRIVER_GENERATOR check and update measurement interval
-        sensirion_i2c_hal_sleep_usec(1000000);
-        // TODO: DRIVER_GENERATOR Add scaling and offset to printed measurement
-        // values
-
-        uint16_t gas_ticks;
-        uint16_t temperature_ticks;
-
         error = stc3x_measure_gas_concentration(&gas_ticks, &temperature_ticks);
-
         if (error) {
             printf("Error executing stc3x_measure_gas_concentration(): %i\n",
                    error);
         } else {
-            printf("Gas_ticks: %u\n", gas_ticks);
-            printf("Temperature_ticks: %u\n", temperature_ticks);
+            gas = 100 * ((float)gas_ticks - 16384.0) / 32768.0;
+            temperature = (float)temperature_ticks / 200.0;
+            printf("Gas: %f - Temperature: %f\n", gas, temperature);
         }
+
+        sensirion_i2c_hal_sleep_usec(1000000);
     }
 
     return 0;
