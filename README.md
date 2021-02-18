@@ -1,3 +1,10 @@
+# Sensirion Embedded I2C STC3x Driver
+
+This is a generic embedded driver for the [Sensirion STC3x Sensor](https://www.sensirion.com/en/environmental-sensors/carbon-dioxide-sensors/co2-sensor-stc31-coming-soon/).
+It enables developers to communicate with the STC3x sensor on different hardware platforms by only adapting the I2C communication related source files.
+
+<center><img src="https://www.sensirion.com/fileadmin/user_upload/customers/sensirion/Pictures/1_Products/Thermal_Conductivity/Sensirion_Thermal-Conductivity_STC31.png"></center>
+
 # Getting started
 
 ## Implement the I2C Interface
