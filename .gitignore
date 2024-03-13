@@ -1,2 +1,3 @@
-/stc3x_i2c_example_usage
-.idea
+/example-usage/stc3x_i2c_example_usage
+/tests/stc3x_test_hw_i2c
+/tests/stc3x_test_sw_i2c
