@@ -47,6 +47,11 @@ extern "C" {
 #define STC31_C_I2C_ADDR_29 0x29
 #define STC31_I2C_ADDR_29 0x29
 
+// binary gas < 0x10
+#define STC31_MEASUREMENT_DELAY_LOW 66
+// binary gas >= 0x10
+#define STC31_MEASUREMENT_DELAY_HIGH 110
+
 typedef enum {
     STC3X_SET_BINARY_GAS_CMD_ID = 0x3615,
     STC3X_SET_RELATIVE_HUMIDITY_RAW_CMD_ID = 0x3624,

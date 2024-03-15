@@ -47,6 +47,8 @@ static uint8_t communication_buffer[47] = {0};
 
 static uint8_t _i2c_address;
 
+static uint32_t _measurement_delay = STC31_MEASUREMENT_DELAY_LOW;
+
 void stc3x_init(uint8_t i2c_address) {
     _i2c_address = i2c_address;
 }
@@ -104,6 +106,12 @@ int16_t stc3x_set_binary_gas(uint16_t binary_gas) {
         sensirion_i2c_write_data(_i2c_address, buffer_ptr, local_offset);
     if (local_error != NO_ERROR) {
         return local_error;
+    }
+
+    if (binary_gas < 0x10) {
+        _measurement_delay = STC31_MEASUREMENT_DELAY_LOW;
+    } else {
+        _measurement_delay = STC31_MEASUREMENT_DELAY_HIGH;
     }
     sensirion_i2c_hal_sleep_usec(1 * 1000);
     return local_error;
@@ -172,7 +180,7 @@ int16_t stc3x_measure_gas_concentration_raw(uint16_t* gas_ticks,
     if (local_error != NO_ERROR) {
         return local_error;
     }
-    sensirion_i2c_hal_sleep_usec(70 * 1000);
+    sensirion_i2c_hal_sleep_usec(_measurement_delay * 1000);
     local_error = sensirion_i2c_read_data_inplace(_i2c_address, buffer_ptr, 4);
     if (local_error != NO_ERROR) {
         return local_error;
