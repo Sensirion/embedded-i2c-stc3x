@@ -28,14 +28,14 @@ set(PICO_BOARD pico CACHE STRING "Board type")
 # Pull in Raspberry Pi Pico SDK (must be before project)
 include(pico_sdk_import.cmake)
 
-project(myEmbedded_STC3x C CXX ASM)
+project(main C CXX ASM)
 
 # Initialise the Raspberry Pi Pico SDK
 pico_sdk_init()
 
 # Add executable. Default name is the project name, version 0.1
 
-add_executable(myEmbedded_STC3x
+add_executable(main
     stc3x_i2c_example_usage.c 
     sensirion_i2c.c
     sensirion_i2c_hal.c
@@ -43,27 +43,27 @@ add_executable(myEmbedded_STC3x
     sensirion_common.c
 )
 
-pico_set_program_name(myEmbedded_STC3x "myEmbedded_STC3x")
-pico_set_program_version(myEmbedded_STC3x "0.1")
+pico_set_program_name(main "main")
+pico_set_program_version(main "0.1")
 
 # Modify the below lines to enable/disable output over UART/USB
-pico_enable_stdio_uart(myEmbedded_STC3x 0)
-pico_enable_stdio_usb(myEmbedded_STC3x 0)
+pico_enable_stdio_uart(main 0)
+pico_enable_stdio_usb(main 0)
 
 # Add the standard library to the build
-target_link_libraries(myEmbedded_STC3x
+target_link_libraries(main
         hardware_i2c    
         pico_stdlib)
 
 # Add the standard include files to the build
-target_include_directories(myEmbedded_STC3x PRIVATE
+target_include_directories(main PRIVATE
   ${CMAKE_CURRENT_LIST_DIR}
   ${CMAKE_CURRENT_LIST_DIR}/.. # for our common lwipopts or any other standard includes, if required
 )
 
 # Add any user requested libraries
-target_link_libraries(myEmbedded_STC3x 
+target_link_libraries(main 
         
         )
 
-pico_add_extra_outputs(myEmbedded_STC3x)
+pico_add_extra_outputs(main)
