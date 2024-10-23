@@ -90,7 +90,7 @@ int16_t stc3x_get_product_id(uint32_t* product_id, uint64_t* serial_number) {
     }
     *product_id = product_number;
     *serial_number =
-        ((uint64_t)(serial_number_high)*4294967296) + serial_number_low;
+        ((uint64_t)(serial_number_high) * 4294967296) + serial_number_low;
     return local_error;
 }
 
