@@ -88,7 +88,7 @@ int main(void) {
         error =
             stc3x_measure_gas_concentration_raw(&gas_ticks, &temperature_ticks);
         if (error) {
-            printf("Error executing stc3x_measure_gas_concentration(): %i\n",
+            printf("Error executing stc3x_measure_gas_concentration_raw(): %i\n",
                    error);
         } else {
             gas = 100 * ((float)gas_ticks - 16384.0) / 32768.0;
