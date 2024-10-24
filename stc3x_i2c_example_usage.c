@@ -67,7 +67,7 @@ int main(void) {
     if (error) {
         printf("Error executing stc3x_self_test(): %i\n", error);
     } else {
-        printf("Self Test: 0x%04x (OK = 0x0000)\n", self_test_output);
+        printf("Self Test: 0x%04x (OK = 0x0000)\n", self_test_output.value);
     }
 
     error = stc3x_set_binary_gas(0x0001);
