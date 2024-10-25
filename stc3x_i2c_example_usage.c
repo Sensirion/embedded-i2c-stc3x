@@ -39,7 +39,7 @@
 /**
  * TO USE CONSOLE OUTPUT (PRINTF) IF NOT PRESENT ON YOUR PLATFORM
  */
-//#define printf(...)
+// #define printf(...)
 
 int main(void) {
     int16_t error = 0;
@@ -53,26 +53,21 @@ int main(void) {
     }
 
     uint32_t product_number;
-    uint8_t serial[8];
-    error = stc3x_read_product_identifier(&product_number, serial, 8);
+    uint64_t serial_number = 0;
+    error = stc3x_get_product_id(&product_number, &serial_number);
     if (error) {
         printf("Error executing stc3x_read_product_identifier(): %i\n", error);
     } else {
-        // uint64_t serial_number =
-        //    (uint64_t)serial[0] << 56 | (uint64_t)serial[1] << 48 |
-        //    (uint64_t)serial[2] << 40 | (uint64_t)serial[3] << 32 |
-        //    (uint64_t)serial[4] << 24 | (uint64_t)serial[5] << 16 |
-        //    (uint64_t)serial[6] << 8 | (uint64_t)serial[7];
         printf("Product Number: 0x%08x\n", product_number);
-        // printf("Serial Number: %" PRIu64 "\n", serial_number);
+        printf("Serial Number: %" PRIu64 "\n", serial_number);
     }
 
-    uint16_t self_test_output;
+    stc3x_test_result_t self_test_output;
     error = stc3x_self_test(&self_test_output);
     if (error) {
         printf("Error executing stc3x_self_test(): %i\n", error);
     } else {
-        printf("Self Test: 0x%04x (OK = 0x0000)\n", self_test_output);
+        printf("Self Test: 0x%04x (OK = 0x0000)\n", self_test_output.value);
     }
 
     error = stc3x_set_binary_gas(0x0001);
@@ -90,10 +85,12 @@ int main(void) {
 
     for (;;) {
         // Read Measurement
-        error = stc3x_measure_gas_concentration(&gas_ticks, &temperature_ticks);
+        error =
+            stc3x_measure_gas_concentration_raw(&gas_ticks, &temperature_ticks);
         if (error) {
-            printf("Error executing stc3x_measure_gas_concentration(): %i\n",
-                   error);
+            printf(
+                "Error executing stc3x_measure_gas_concentration_raw(): %i\n",
+                error);
         } else {
             gas = 100 * ((float)gas_ticks - 16384.0) / 32768.0;
             temperature = (float)temperature_ticks / 200.0;
