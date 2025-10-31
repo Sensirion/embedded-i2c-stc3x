@@ -1,4 +1,5 @@
-#include <hardware/i2c.h>
+#include "hardware/i2c.h"
+#include "pico/stdlib.h"
 /*
  * Copyright (c) 2018, Sensirion AG
  * All rights reserved.
@@ -34,13 +35,9 @@
 #include "sensirion_config.h"
 #include "sensirion_i2c_hal.h"
 
-/*
- * INSTRUCTIONS
- * ============
- *
- * Implement all functions where they are marked as IMPLEMENT.
- * Follow the function specification in the comments.
- */
+#define I2C_PORT i2c0
+#define PIN_I2C_SDA 4
+#define PIN_I2C_SCL 5
 
 /**
  * Select the current i2c bus by index.
@@ -64,14 +61,26 @@ int16_t sensirion_i2c_hal_select_bus(uint8_t bus_idx) {
  * communication.
  */
 void sensirion_i2c_hal_init(void) {
-    /* TODO:IMPLEMENT */
+    stdio_init_all();
+
+    // I2C Initialisation. Using it at 400Khz.
+    i2c_init(I2C_PORT, 400 * 1000);
+
+    gpio_set_function(PIN_I2C_SDA, GPIO_FUNC_I2C);
+    gpio_set_function(PIN_I2C_SCL, GPIO_FUNC_I2C);
+    gpio_pull_up(PIN_I2C_SDA);
+    gpio_pull_up(PIN_I2C_SCL);
 }
 
 /**
  * Release all resources initialized by sensirion_i2c_hal_init().
  */
 void sensirion_i2c_hal_free(void) {
-    /* TODO:IMPLEMENT or leave empty if no resources need to be freed */
+    i2c_deinit(I2C_PORT);
+    gpio_set_function(PIN_I2C_SDA, GPIO_FUNC_NULL);
+    gpio_set_function(PIN_I2C_SCL, GPIO_FUNC_NULL);
+    gpio_disable_pulls(PIN_I2C_SDA);
+    gpio_disable_pulls(PIN_I2C_SCL);
 }
 
 /**
@@ -86,6 +95,7 @@ void sensirion_i2c_hal_free(void) {
  */
 int8_t sensirion_i2c_hal_read(uint8_t address, uint8_t* data, uint8_t count) {
     int status = i2c_read_blocking(i2c_default, address, data, count, false);
+
     if (status <= 0)
         return 1;
     else
