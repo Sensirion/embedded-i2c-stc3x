@@ -278,8 +278,8 @@ int16_t stc3x_write_sensor_state(const uint8_t* state, uint16_t state_size) {
     uint16_t local_offset = 0;
     local_offset =
         sensirion_i2c_add_command16_to_buffer(buffer_ptr, local_offset, 0xe133);
-    sensirion_i2c_add_bytes_to_buffer(buffer_ptr, local_offset, state,
-                                      state_size);
+    local_offset = sensirion_i2c_add_bytes_to_buffer(buffer_ptr, local_offset,
+                                                     state, state_size);
 
     local_error =
         sensirion_i2c_write_data(_i2c_address, buffer_ptr, local_offset);
